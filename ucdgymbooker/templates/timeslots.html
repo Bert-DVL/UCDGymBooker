@@ -1,0 +1,60 @@
+<!--
+Syntax: url_for('name of the function of the route','parameters (if required)')
+href="{{url_for('static', filename='css/main.css')}}"
+                <td>{row[0]}}</td>
+                <td>{row[1]}}</td>
+                <td>{row[2]}}</td>
+
+-->
+
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Timeslots</title>
+{% endblock %}
+
+{% block body %}
+{% for date in data["dates"] %}
+<h1>{{date}}</h1>
+<table class="table table-striped">
+    <tbody>
+        {% for hour in data[date]["hours"] %}
+            {% if data[date][hour]|length == 2 %}
+                <tr>
+                    <td>{{hour}}</td>
+                    <td>
+                        <form action = "{{ url_for('reserve', reservation_id_1 = data[date][hour][0][0], reservation_id_2 = 0)}}" method="POST">
+                            <input type="submit" class="btn btn-secondary mb-1" value="Book {{data[date][hour][0][1]}}"></input>
+                        </form>
+
+                    <br>
+                        <form action = "{{ url_for('reserve', reservation_id_1 = data[date][hour][0][0], reservation_id_2 = data[date][hour][1][0])}}" method="POST">
+                            <input type="submit" class="btn btn-secondary" value="Book {{data[date][hour][0][1]}} with {{data[date][hour][1][1]}} as backup" ></input>
+                        </form>
+                    </td>
+                    <td>
+                        <form action = "{{ url_for('reserve', reservation_id_1 = data[date][hour][1][0], reservation_id_2 = 0)}}" method="POST">
+                            <input type="submit" class="btn btn-secondary mb-1" value="Book {{data[date][hour][1][1]}}"></input>
+                        </form>
+                    <br>
+                        <form action = "{{ url_for('reserve', reservation_id_1 = data[date][hour][1][0], reservation_id_2 = data[date][hour][0][0])}}" method="POST">
+                            <input type="submit" class="btn btn-secondary" value="Book {{data[date][hour][1][1]}} with {{data[date][hour][0][1]}} as backup" ></input>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>{{hour}}</td>
+                    <td>
+                        <form action = "{{ url_for('reserve', reservation_id_1 = data[date][hour][0][0], reservation_id_2 = 0)}}" method="POST">
+                            <input type="submit" class="btn btn-secondary mb-1" value="Book {{data[date][hour][0][1]}}"></input>
+                        </form>
+                    </td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+{% endblock %}

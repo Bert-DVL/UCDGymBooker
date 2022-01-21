@@ -1,0 +1,67 @@
+Python 3,9,5
+
+wtforms
+flask
+flask-sqlalchemy
+wtforms
+flask-login
+Flask-WTF
+flask_bcrypt
+
+create environment named env in current directory
+virtualenv env
+
+activate virtualenv [needs to be done in bash, not fish]
+source env/bin/activate
+
+=> main python file is where you import from, app.py in this case
+CREATE DB
+python3
+from ucdgymbooker import db
+db.create_all()
+ctrl + D to quit
+
+
+DELETE DB
+python3
+from ucdgymbooker import db
+db.drop_all()
+
+id = 1,
+
+MODIFY DB MANUALLY
+python3
+from app import User, Timeslot, Reservation
+user1 = User(username='test', password='test', verified=True, admin=False)
+db.session.add(user1)
+from datetime import datetime
+timeslot1 = Timeslot(time=datetime.utcnow(), gym='performance')
+db.session.add(timeslot1)
+db.session.commit()
+User.query.all()
+user = User.query.get(1)
+user.id
+timeslot = Timeslot.query.get(1)
+timeslot.id
+reservation1 = Reservation(status='created', timeslot_id = timeslot.id, user_id = 1, priority = 1)
+reservation2 = Reservation(status='created', timeslot_id = timeslot.id, user_id = 1, priority = 2)
+db.session.add(reservation1)
+db.session.add(reservation2)
+db.session.commit()
+Reservation.query.all()
+
+user = db.session.query(User).filter(User.my_id==1).first()
+db.session.delete(user)
+db.session.commit()
+Reservation.query.all()
+
+Reservation.query.filter_by(id=1).delete()
+User.query.filter_by(id=1).delete()
+
+User.query.first()
+User.query.filter_by(username='lala').all()
+user = User.query.get(1) => checks id
+user.posts
+
+
+

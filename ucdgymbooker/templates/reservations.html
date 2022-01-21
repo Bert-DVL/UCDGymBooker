@@ -1,0 +1,28 @@
+<!--
+Syntax: url_for('name of the function of the route','parameters (if required)')
+href="{{url_for('static', filename='css/main.css')}}"
+                <td>{row[0]}}</td>
+                <td>{row[1]}}</td>
+                <td>{row[2]}}</td>
+
+-->
+
+{% extends 'base.html' %}
+
+{% block head %}
+<title>My reservations</title>
+{% endblock %}
+
+{% block body %}
+
+<table class="table table-striped">
+
+    <tbody>
+    {% for reservation in data %}
+    <tr><td>{{reservation}}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
