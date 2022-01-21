@@ -25,6 +25,7 @@ def load_user(user_id):
 
 class RegistrationForm(FlaskForm):
     #
+    name = StringField('fullname', validators=[InputRequired()], description="Your full name", render_kw={"placeholder":"Full Name"})
     username = IntegerField('name', validators=[InputRequired()], description="Your UCD student number", render_kw={"placeholder":"Username"})
     password = PasswordField('password', validators=[InputRequired(), Length(min=7, max=80)], description="You can use any password", render_kw={"placeholder":"Password"})
     submit = SubmitField("Register")
@@ -67,7 +68,7 @@ def register():
 
     if form.validate_on_submit():
         hashed_pwd = bcrypt.generate_password_hash(form.password.data)
-        user = User(username=form.username.data, password=hashed_pwd, verified=False, admin=False)
+        user = User(username=form.username.data, password=hashed_pwd, name=form.name.data, verified=False, admin=False)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -220,12 +221,6 @@ def delete_confirm(reservation_id):
     id = data[0].id
     info['id'] = id
 
-
-
-
-
-
-
     return render_template("delete_confirm.html", data=info)
 
 
@@ -256,20 +251,44 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
-@app.route('/statistics')
+@app.route('/database')
 @login_required
 @admin_required
-def statistics():
+def database():
 
     data = Timeslot.query.all()
 
-    return render_template("timeslots.html", data=data)
+    return render_template("database.html", data=data)
 
 @app.route('/admin_panel')
 @login_required
 @admin_required
 def admin_panel():
 
-    data = Timeslot.query.all()
+    data = User.query.all()
 
-    return render_template("timeslots.html", data=data)
+    return render_template("admin_panel.html", data=data)
+
+@app.route('/modify_user/<int:user_id>/<string:action>', methods = ['POST'])
+@login_required
+@admin_required
+def modify_user(user_id, action):
+
+    if action == 'confirm':
+        print('lala')
+    if action == 'disconfirm':
+        print('lala')
+    if action == 'add_admin':
+        print('lala')
+    if action == 'remove_admin':
+        print('lala')
+    if action == 'delete':
+        print('lala')
+
+
+
+
+
+    data = User.query.all()
+
+    return render_template("admin_panel.html", data=data)

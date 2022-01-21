@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Amin Panel</title>
+{% endblock %}
+
+{% block body %}
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>UCD id</th>
+            <th>Account verified</th>
+            <th>Admin</th>
+            <th>Verification</th>
+            <th>Change admin</th>
+            <th>Delete user</th>
+
+        </tr>
+    </thead>
+
+
+    <tbody>
+    {% for user in data %}
+    <tr>
+        <td>{{user.id}}</td>
+        <td>{{user.name}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.verified}}</td>
+        <td>{{user.admin}}</td>
+        <td>
+{% if current_user.verified %}
+            <form action = "{{ url_for('modify_user', user_id = user.id, action = confirm)}}" method="POST">
+                            <input type="submit" class="btn btn-secondary mb-1" value="De-verify"></input>
+            </form>
+{% endif %}
+{% if not current_user.verified %}
+            <form action = "{{ url_for('modify_user', user_id = user.id, action = confirm)}}" method="POST">
+                            <input type="submit" class="btn btn-success mb-1" value="Verify"></input>
+            </form>
+{% endif %}
+        </td>
+        <td>
+{% if current_user.admin %}
+            <form action = "{{ url_for('delete_confirm', reservation_id = 3)}}" method="POST">
+                            <input type="submit" class="btn btn-secondary mb-1" value="Remove admin"></input>
+            </form>
+{% endif %}
+{% if not current_user.admin %}
+            <form action = "{{ url_for('delete_confirm', reservation_id = 3)}}" method="POST">
+                            <input type="submit" class="btn btn-primary mb-1" value="Make admin"></input>
+            </form>
+{% endif %}
+        </td>
+        <td>
+            <form action = "{{ url_for('delete_confirm', reservation_id = 3)}}" method="POST">
+                            <input type="submit" class="btn btn-danger mb-1" value="Delete"></input>
+            </form>
+        </td>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

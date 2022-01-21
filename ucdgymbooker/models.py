@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(80), nullable=False)
     verified = db.Column(db.Boolean, nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
     #relationship to Reservation model, backref is like adding column to Reservation, if you query user_ids of a Reservation it will return said id, lazy is related to data loading
     #the relationship.backref keyword is only a common shortcut for placing a second relationship()
     #backref allows you to access the user that created sth directly instead of querying by id
@@ -29,7 +30,7 @@ class User(db.Model):
         return True
 
     def __repr__(self):
-        return f"User (id: {self.id}, usr:{self.username}, pwd: {self.password}, verified: {self.verified}, admin: {self.admin})"
+        return f"User (id: {self.id}, name:{self.name}, s_id:{self.username}, pwd: {self.password}, verified: {self.verified}, admin: {self.admin})"
 
 #default = datetime.utcnow, not datetime.utcnow() => no parentheses as it would return a value that was evaluated when you start running the app instead of a returning function that gets evaluated at runtime
 class Timeslot(db.Model):
