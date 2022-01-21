@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Test</title>
+{% endblock %}
+
+
+{% block body %}
+<h4>Are you sure that you want to delete the following reservation?</h4>
+{{data['date']}}
+<br>
+{{data['gym']}}
+<br>
+Note: if you have a backup reservation at the same time you need to delete it separately
+
+
+<form action = "{{ url_for('delete', reservation_id = data['id'] ) }}" method="POST">
+                            <input type="submit" class="btn btn-danger mb-1" value="Delete"></input>
+</form>
+
+<a href="{{ url_for('reservations')}}" class="btn btn-secondary mb-1">Cancel</a>
+
+{% endblock %}

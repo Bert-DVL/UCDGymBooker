@@ -16,10 +16,31 @@ href="{{url_for('static', filename='css/main.css')}}"
 {% block body %}
 
 <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Gym</th>
+            <th>Priority</th>
+            <th>Queue</th>
+            <th>Status</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+
 
     <tbody>
     {% for reservation in data %}
-    <tr><td>{{reservation}}</td></tr>
+    <tr>
+        <td>{{reservation['date']}}</td>
+        <td>{{reservation['gym']}}</td>
+        <td>{{reservation['priority']}}</td>
+        <td>WIP</td>
+        <td>{{reservation['status']}}</td>
+        <td>
+            <form action = "{{ url_for('delete_confirm', reservation_id = reservation['id'])}}" method="POST">
+                            <input type="submit" class="btn btn-danger mb-1" value="Delete"></input>
+            </form>
+        </td>
     {% endfor %}
     </tbody>
 </table>

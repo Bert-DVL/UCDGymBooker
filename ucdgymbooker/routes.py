@@ -84,6 +84,7 @@ def logout():
 #https://stackoverflow.com/questions/44697201/prevent-user-to-edit-other-users-profile
 #TODO convert back to dublin time
 #TODO order poolside and performance using append and prepend
+#TODO separate days into different requests if issues arise with performance
 @app.route('/timeslots')
 @login_required
 def timeslots():
@@ -96,9 +97,9 @@ def timeslots():
         gym = elem.gym
         id = elem.id
 
-        #%A %B for fullnames
-        date_string = time.strftime("%a %d %b %Y")
-        time_string = time.strftime("%H:%M")
+
+        date_string = timezone_converter.get_date_string(time)
+        time_string = timezone_converter.get_time_string(time)
 
         if not date_string in info:
             info["dates"].append(date_string)
@@ -107,12 +108,12 @@ def timeslots():
         if not time_string in info[date_string]:
             info[date_string][time_string] = []
             info[date_string]["hours"].append(time_string)
-        list = [id, gym]
+        info_list = [id, gym]
         print(gym)
         if gym == "Poolside Gym":
-            info[date_string][time_string].append(list)
+            info[date_string][time_string].append(info_list)
         else:
-            info[date_string][time_string].insert(0, list)
+            info[date_string][time_string].insert(0, info_list)
 
 
 
@@ -120,21 +121,54 @@ def timeslots():
 
 
 
-        #print(elem)
+    #print(elem)
     #data structure => dict with date which has more dicts with hours as key and
-    print(info["dates"])
-    print(info[info["dates"][1]])
+    #print(info["dates"])
+    #print(info[info["dates"][1]])
     #date string, hour, minute, gym, id
 
     return render_template("timeslots.html", data=info)
 
+#TODO only take reservations past current date
 @app.route('/reservations')
 @login_required
 def reservations():
-    data = Reservation.query.filter_by(user_id=current_user.get_id())
+    #data = Reservation.query.filter_by(user_id=current_user.get_id()).join(Timeslot)
+    data = db.session.query(Reservation, Timeslot).join(Timeslot).filter(Reservation.user_id==current_user.get_id())
+    print(data)
 
 
-    return render_template("reservations.html", data=data)
+
+    info = []
+
+    for reservation, timeslot in data:
+        info_elem = {}
+
+        time = timezone_converter.utc_to_ie(timeslot.time)
+        date_string = timezone_converter.get_date_string(time) + ', ' + timezone_converter.get_time_string(time)
+        info_elem['date'] = date_string
+
+        gym = timeslot.gym
+        info_elem['gym'] = gym
+
+        id = reservation.id
+        info_elem['id'] = id
+
+        status = reservation.status
+        info_elem['status'] = status
+
+        priority = 'Primary'
+        if reservation.priority == 2:
+            priority = 'Secondary'
+
+        info_elem['priority'] = priority
+
+        info.append(info_elem)
+
+
+
+
+    return render_template("reservations.html", data=info)
 
 @app.route('/reserve/<int:reservation_id_1>', methods = ['POST'])
 @app.route('/reserve/<int:reservation_id_1>/<int:reservation_id_2>', methods = ['POST'])
@@ -142,29 +176,69 @@ def reservations():
 def reserve(reservation_id_1, reservation_id_2=0):
     #if request.method == 'GET':
 
-    new_reservation_1 = Reservation(status='Booked', user_id=current_user.get_id(), timeslot_id=reservation_id_1, priority=1)
+    now = timezone_converter.get_current_utc_timestamp()
+
+    priority_num = 0
+
+    if not reservation_id_2 == 0:
+        priority_num = 1
+
+
+
+    new_reservation_1 = Reservation(status='Booked', user_id=current_user.get_id(), timeslot_id=reservation_id_1,
+                                    priority=priority_num, reservation_time=now)
     db.session.add(new_reservation_1)
     db.session.commit()
 
+
+
     if not reservation_id_2 == 0:
+
         new_reservation_2 = Reservation(status='Booked', user_id=current_user.get_id(), timeslot_id=reservation_id_2,
-                                        priority=2)
+                                        priority=2, reservation_time=now)
         db.session.add(new_reservation_2)
         db.session.commit()
 
 
     return redirect('/reservations', code=302)
 
-@app.route('/cancel/<int:reservation_id>', methods = ['POST'])
+@app.route('/delete_confirm/<int:reservation_id>', methods = ['POST'])
 @login_required
-def cancel(reservation_id):
+def delete_confirm(reservation_id):
+    data = db.session.query(Reservation, Timeslot).join(Timeslot).filter(Reservation.id == reservation_id).one()
+    print(data)
+
+    info = {}
+
+    time = timezone_converter.utc_to_ie(data[1].time)
+    date_string = timezone_converter.get_date_string(time) + ', ' + timezone_converter.get_time_string(time)
+    info['date'] = date_string
+
+    gym = data[1].gym
+    info['gym'] = gym
+
+    id = data[0].id
+    info['id'] = id
+
+
+
+
+
+
+
+    return render_template("delete_confirm.html", data=info)
+
+
+@app.route('/delete/<int:reservation_id>', methods = ['POST'])
+@login_required
+def delete(reservation_id):
     #if request.method == 'GET':
-    data = Reservation.query.filter_by(user_id = current_user.get_id())
-    if not reservation_id == 0:
-        print("lala")
 
+    reservation = db.session.query(Reservation).filter(Reservation.id == reservation_id, Reservation.user_id==current_user.get_id()).first()
+    db.session.delete(reservation)
+    db.session.commit()
 
-    return render_template("reservations.html", data=data)
+    return redirect('/reservations', code=302)
 
 
 #Modified from https://stackoverflow.com/questions/61939800/role-based-authorization-in-flask-login

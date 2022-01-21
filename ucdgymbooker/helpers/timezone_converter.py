@@ -22,6 +22,13 @@ def utc_to_ie(time):
 def ie_to_utc(time):
     return time.astimezone(tz_utc)
 
+#%A %B for fullnames
+def get_date_string(time):
+    return time.strftime("%a %d %b %Y")
+
+def get_time_string(time):
+    return time.strftime("%H:%M")
+
 #quick sanity check function
 def checker_timezones():
     timestamp = create_ie_timestamp(2022, 1, 12, 6, 0)
