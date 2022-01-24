@@ -22,7 +22,9 @@ class User(db.Model):
     def get_id(self):
         return self.id
 
+
     def is_authenticated(self):
+        # Change this to "return self.verified" if you only want users who are verified by an admin
         return True
 
     #TODO change method in production

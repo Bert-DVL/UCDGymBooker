@@ -58,7 +58,7 @@ def login():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('timeslots'))
+                return redirect(url_for('timeslots'), code=302)
     return render_template("login.html", form=form)
 
 
@@ -71,14 +71,14 @@ def register():
         user = User(username=form.username.data, password=hashed_pwd, name=form.name.data, verified=False, admin=False)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('login'))
+        return redirect(url_for('login'), code=302)
     return render_template("register.html", form=form)
 
 @app.route('/logout', methods = ['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('index'), code=302)
 
 
 #TODO double check all reservation and modification requests with current user variable
@@ -233,7 +233,7 @@ def delete(reservation_id):
     db.session.delete(reservation)
     db.session.commit()
 
-    return redirect('/reservations', code=302)
+    return redirect(url_for('reservations'), code=302)
 
 
 #Modified from https://stackoverflow.com/questions/61939800/role-based-authorization-in-flask-login
@@ -273,17 +273,26 @@ def admin_panel():
 @login_required
 @admin_required
 def modify_user(user_id, action):
+    user = User.query.filter(User.id == user_id).first()
+
 
     if action == 'confirm':
-        print('lala')
+        user.verified = True
     if action == 'disconfirm':
-        print('lala')
+        user.verified = False
     if action == 'add_admin':
-        print('lala')
+        user.admin = True
     if action == 'remove_admin':
-        print('lala')
+        if current_user.get_id() > user.id:
+            flash('You cannot remove admin privileges from a user who registered before you.')
+        else:
+            user.admin = False
     if action == 'delete':
-        print('lala')
+        if user.admin:
+            flash('You cannot remove a user if they are an admin, remove their admin status before deleting.')
+        else:
+            db.session.delete(user)
+    db.session.commit()
 
 
 
@@ -291,4 +300,4 @@ def modify_user(user_id, action):
 
     data = User.query.all()
 
-    return render_template("admin_panel.html", data=data)
+    return redirect(url_for('admin_panel'), code=302)

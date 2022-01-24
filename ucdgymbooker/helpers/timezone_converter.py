@@ -1,5 +1,5 @@
 #import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import tz
 
 #all timezone stuff is put in the same file as creating bugs on accident is super easy
@@ -28,6 +28,12 @@ def get_date_string(time):
 
 def get_time_string(time):
     return time.strftime("%H:%M")
+
+def subtract_time(time, hours, minutes):
+    return time - timedelta(hours=hours, minutes=minutes)
+
+def add_time(time, hours, minutes):
+    return time + timedelta(hours=hours, minutes=minutes)
 
 #quick sanity check function
 def checker_timezones():
@@ -61,6 +67,20 @@ def checker_timezones():
     print("bottom is Irish in summer time, should be one hour more")
     print(timestamp3)
     print(timestamp4)
+
+    # subtract hours
+    timestamp5 = create_utc_timestamp(2022, 6, 12, 6, 0)
+    timestamp6 = subtract_time(timestamp5, 3, 20)
+    print("both are utc, bottom should be 3 hours and 20 minutes less")
+    print(timestamp5)
+    print(timestamp6)
+
+    # add hours
+    timestamp5 = create_utc_timestamp(2022, 6, 12, 6, 0)
+    timestamp6 = add_time(timestamp5, 3, 20)
+    print("both are utc, bottom should be 3 hours and 20 minutes more")
+    print(timestamp5)
+    print(timestamp6)
 
     print("should be current time with UTC specification")
     print(get_current_utc_timestamp())

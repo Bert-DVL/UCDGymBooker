@@ -38,6 +38,7 @@ xpath3 = '//*[@id="pagebar"]/form/select/option[1]'
 #https://towardsdatascience.com/using-python-and-selenium-to-automate-filling-forms-and-mouse-clicks-f87c74ed5c0f
 options = webdriver.ChromeOptions()
 service = Service(os.path.join(os.getcwd(), os.path.join('webdriver','chromedriver')))
+#TODO uncomment
 #options.add_argument("headless")
 
 driver = webdriver.Chrome(service=service, options=options)
@@ -109,8 +110,8 @@ page_html = driver.find_element(By.XPATH, xpath).get_attribute('outerHTML')
 #print(dates_html)
 
 #TODO change to bs4 because apparently the already selected element does not appear due to differing syntax
-dates = re.findall(r'<option value="[0-9,A-Z,-]*">(.*)<\/option>', page_html)
-print(dates)
+#dates = re.findall(r'<option value="[0-9,A-Z,-]*">(.*)<\/option>', page_html)
+#print(dates)
 
 #TODO uncomment this
 
@@ -119,7 +120,7 @@ html = driver.page_source
 soup = BeautifulSoup(html, features="html.parser")
 
 #dates = re.findall(r'<option value="[0-9,A-Z,-]*">(.*)<\/option>', page_html)
-print(dates)
+#print(dates)
 dates_selector = soup.find("select",{"name":"p_code1"})
 print(dates_selector)
 dates_html = dates_selector.findChildren("option")
