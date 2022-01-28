@@ -78,7 +78,11 @@ def extract_timeslots(table, datestring):
             timestamp_utc = timezone_converter.ie_to_utc(timestamp_ie)
             #timestamp_ie = datetime(year, month, day, hour, minute, 0, 0, tz_utc)
             #timestamp_utc = timestamp_ie.astimezone(tz_ie)
-            gym = cells[3].string
+            gym = cells[3].string[0:4].lower()
+            if gym == 'pool':
+                gym = 'Poolside Gym'
+            if gym == 'perf':
+                gym = 'Performance Gym'
             dict = {"gym": gym, "date":timestamp_utc}
             timeslots.append(dict)
 
@@ -158,7 +162,7 @@ for i in range(0, len(dates)):
     update_db_if_not_exists(timeslots)
 
 
-
+driver.quit()
 
 '''
 

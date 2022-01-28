@@ -89,7 +89,7 @@ def logout():
 @app.route('/timeslots')
 @login_required
 def timeslots():
-    data = Timeslot.query.filter(Timeslot.time >= timezone_converter.get_current_utc_timestamp())
+    data = Timeslot.query.filter(Timeslot.time >= timezone_converter.add_time(timezone_converter.get_current_utc_timestamp(), -3, 0))
 
     info = {"dates":[]}
     #if "keyword" in info
